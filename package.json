@@ -1,6 +1,6 @@
 {
   "name": "dsh-global-system-prompt",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "cc-switch-style global prompt for DeepSeek Harness (dsh 0.1.5): one user-editable block injected into the system prompt of every conversation, mirrored into each session project's AGENTS.md, and naming the harness's user-global AGENTS.md by absolute path so the model stops hunting for it. Edited from the web settings panel.",
   "license": "MIT",
   "author": "dsh-global-system-prompt contributors",

@@ -2,6 +2,10 @@
 
 English | [中文](README.md)
 
+[![npm version](https://img.shields.io/npm/v/dsh-global-system-prompt)](https://www.npmjs.com/package/dsh-global-system-prompt)
+[![license](https://img.shields.io/npm/l/dsh-global-system-prompt)](LICENSE)
+[![topic: dsh-plugin](https://img.shields.io/badge/topic-dsh--plugin-0969da)](https://github.com/topics/dsh-plugin)
+
 ## Summary
 
 `dsh-global-system-prompt` brings cc-switch's "global prompt" to DeepSeek Harness: one block of text you write yourself, carried by **every conversation**, edited right in the web settings panel, and live from the next turn on.
@@ -41,14 +45,20 @@ The two channels switch off separately: `enabled: false` stops the whole row, `s
 <a id="install"></a>
 ## Install
 
-Straight from GitHub (recommended; no npm release needed):
+From npm (the published path):
 
 ```powershell
 # the profile that serves the web UI
-dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt
+dsh plugin --profile web add dsh-global-system-prompt
 
 # the TUI profile works too (no web server: injection and project sync only)
-dsh plugin --profile dsh-tui add github:YMRwithNoworry/dsh-global-system-prompt
+dsh plugin --profile dsh-tui add dsh-global-system-prompt
+```
+
+Straight from GitHub (to track the repository, or to pin a commit):
+
+```powershell
+dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt
 
 # pin a commit by appending #<commit-sha> to the repo
 dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt#<commit-sha>
@@ -64,7 +74,7 @@ dsh plugin --profile web add file:<checkout-path>
 dsh plugin --profile web add link:<checkout-path>
 ```
 
-> The package is named `dsh-global-system-prompt` and is **not published to npm yet** (an unrelated third-party package called `dsh-global-prompt` exists there — don't mix them up), so the GitHub form above is the one to use today.
+> The package is named `dsh-global-system-prompt`. An unrelated third-party package called `dsh-global-prompt` also exists on npm — don't mix them up.
 
 `dsh plugin add` records the package as a profile dependency and appends any package declaring `dsh.bundle` to `dsh.profile.bundles`. **Adding a bundle is a startup boundary**, so restart dsh once; prompt edits never need a restart afterwards.
 

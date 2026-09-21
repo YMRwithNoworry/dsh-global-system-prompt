@@ -2,6 +2,10 @@
 
 [English](README.en.md) | 中文
 
+[![npm version](https://img.shields.io/npm/v/dsh-global-system-prompt)](https://www.npmjs.com/package/dsh-global-system-prompt)
+[![license](https://img.shields.io/npm/l/dsh-global-system-prompt)](LICENSE)
+[![topic: dsh-plugin](https://img.shields.io/badge/topic-dsh--plugin-0969da)](https://github.com/topics/dsh-plugin)
+
 ## 概述
 
 `dsh-global-system-prompt` 给 DeepSeek Harness 补上 cc-switch 那个「全局提示词」：一段你自己写的文字，**每一次对话都会带上**，在 Web 设置面板里直接编辑，保存后下一轮对话即生效。
@@ -41,16 +45,22 @@ Harness file locations (exact paths — read or edit these directly instead of s
 <a id="安装"></a>
 ## 安装
 
-从 GitHub 直接装（推荐，不需要 npm 发布）：
+从 npm 装（正式方式）：
 
 ```powershell
 # Web 面板用的 profile
-dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt
+dsh plugin --profile web add dsh-global-system-prompt
 
 # TUI profile 也可以装（没有 Web 服务器，只有注入与项目同步生效）
-dsh plugin --profile dsh-tui add github:YMRwithNoworry/dsh-global-system-prompt
+dsh plugin --profile dsh-tui add dsh-global-system-prompt
+```
 
-# 想钉住某个提交：仓库名后面接 #<commit-sha>
+从 GitHub 装（想直接跟仓库走，或者钉住某个提交）：
+
+```powershell
+dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt
+
+# 钉住提交：仓库名后面接 #<commit-sha>
 dsh plugin --profile web add github:YMRwithNoworry/dsh-global-system-prompt#<commit-sha>
 ```
 
@@ -64,7 +74,7 @@ dsh plugin --profile web add file:<本仓库路径>
 dsh plugin --profile web add link:<本仓库路径>
 ```
 
-> 包名是 `dsh-global-system-prompt`，npm 上**尚未发布**（npm 上另有一个别人的 `dsh-global-prompt`，同名不同包，与本包无关），所以现在用上面的 GitHub 形式安装。
+> 包名是 `dsh-global-system-prompt`。npm 上另有一个别人的 `dsh-global-prompt`（同名不同包，与本包无关），别装错了。
 
 `dsh plugin add` 会把包加进 profile 的 `dependencies`，并把声明了 `dsh.bundle` 的包追加到 `dsh.profile.bundles`。**新增 bundle 是启动边界**，装完要重启一次 dsh；之后改提示词内容就完全不用重启了。
 
