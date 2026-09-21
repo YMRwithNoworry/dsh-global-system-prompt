@@ -1,0 +1,15 @@
+# Dependencies are never committed; dsh installs the package into a profile.
+node_modules/
+
+# Editor, OS, and npm noise.
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.tmp/
+*.tmp
+
+# The plugin's own staged writes (`.global-prompt.tmp`, `.agents-sync.tmp`) land
+# next to their target, so a slice of a prompt file must never be committed.
+.*.global-prompt.tmp
+.*.agents-sync.tmp

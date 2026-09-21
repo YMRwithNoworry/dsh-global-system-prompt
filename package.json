@@ -1,0 +1,85 @@
+{
+  "name": "dsh-global-system-prompt",
+  "version": "0.3.0",
+  "description": "cc-switch-style global prompt for DeepSeek Harness (dsh 0.1.5): one user-editable block injected into the system prompt of every conversation, mirrored into each session project's AGENTS.md, and naming the harness's user-global AGENTS.md by absolute path so the model stops hunting for it. Edited from the web settings panel.",
+  "license": "MIT",
+  "author": "dsh-global-system-prompt contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YMRwithNoworry/dsh-global-system-prompt.git"
+  },
+  "homepage": "https://github.com/YMRwithNoworry/dsh-global-system-prompt#readme",
+  "bugs": {
+    "url": "https://github.com/YMRwithNoworry/dsh-global-system-prompt/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "main": "./lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./config": {
+      "default": "./lib/config.js"
+    },
+    "./prompt": {
+      "default": "./lib/prompt.js"
+    },
+    "./route": {
+      "default": "./lib/route.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "examples",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "global-prompt",
+    "system-prompt",
+    "agents-md",
+    "cc-switch",
+    "cordis"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "test:e2e": "node dev/e2e-installed.mjs",
+    "prepublishOnly": "node --test test/"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  }
+}

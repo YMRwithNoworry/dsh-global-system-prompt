@@ -1,0 +1,3 @@
+# The package runs on Node and is read by dsh on any platform: keep LF in the
+# repository and let git normalize on checkout.
+* text=auto eol=lf

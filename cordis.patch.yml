@@ -1,0 +1,70 @@
+# dsh-global-system-prompt — profile bundle patch (dsh 0.1.5).
+#
+# One row: the host plugin registers a single system-prompt section whose text is
+# read from a user-editable file on every assembly, and (when the profile has a
+# web server) serves the read/write route the settings panel edits.
+#
+# Later layers override this row by id, and a patch replaces the whole `config`
+# object, so a profile that customizes one field restates the others.
+
+- insert:
+    - id: global-prompt
+      name: 'dsh-global-system-prompt'
+      config:
+        # Master switch. false keeps the editor route alive but injects nothing.
+        enabled: true
+        # Prompt file. Default: $DSH_HOME/global-prompt.md (i.e. ~/.dsh/global-prompt.md).
+        # `~`, `~/` and `~\` expand to the OS home; a relative path resolves
+        # against the process working directory.
+        # file: ~/.dsh/global-prompt.md
+        # Where the block lands in the system prompt. -1000 is the harness
+        # identity line, 0 the deployment persona prefix, 500 the plan policy.
+        # -900 therefore reads as a preamble, right after the identity line.
+        order: -900
+        # Text used only while the file does not exist yet (the file wins once
+        # it exists, even when it is empty). Empty by default.
+        text: ''
+        # UTF-8 byte cap for the injected block; longer files are truncated.
+        maxBytes: 65536
+        # Prompt sections interpolate `{{variable}}` groups strictly and throw on
+        # unknown names, so a global prompt containing literal `{{...}}` (JSON
+        # examples, templates) would break the turn. true neutralizes every `{{`
+        # with a zero-width space; false injects the file verbatim.
+        escapeBraces: true
+        # Append the "Harness file locations" footer naming this prompt file and
+        # the user-global instruction file by absolute path. The harness's own
+        # runtime context mentions the latter only as a bare "AGENTS.md", which
+        # sends the model searching for it; this footer is what stops the search.
+        announcePaths: true
+        # The harness's user-global instruction file (default $DSH_HOME/AGENTS.md,
+        # the file @deepseek-ai/dsh-agent-instructions reads). Announced by path,
+        # and optionally included as content below. Set to '' to drop it entirely.
+        # instructionsFile: ~/.dsh/AGENTS.md
+        # Also include that file's content in this block. Off by default because
+        # dsh-agent-instructions already injects it as context in every
+        # base-backed profile; turn it on for profiles that do not mount that
+        # plugin (e.g. a hand-built sdk-minimal composition).
+        includeInstructions: false
+        # Replace the generated footer with your own text (used verbatim, no
+        # placeholders). Leave empty to keep the generated one.
+        pathsNote: ''
+        # Mirror the prompt into the AGENTS.md of the **project each session runs
+        # in**, as a managed block between `<!-- BEGIN dsh-global-system-prompt -->`
+        # and `<!-- END dsh-global-system-prompt -->`. That is the channel every
+        # tool following the AGENTS.md convention reads, and the one that survives
+        # leaving dsh. The plugin owns that block and nothing else: a project's own
+        # rules are kept verbatim, and deleting the block stops the sync.
+        syncProjectAgents: true
+        # File the block goes into, relative to the project root. Bare name only.
+        # projectAgentsFileName: AGENTS.md
+        # Names that mark a project root while walking up from the session cwd.
+        # `.git` matches the harness's own discovery, so the block lands in the
+        # file dsh already reads as workspace instructions.
+        # projectRootMarkers: ['.git']
+        # What to do when no marker turns up on the way up: 'cwd' mirrors into the
+        # session directory itself, 'skip' keeps the plugin out of directories that
+        # are not a recognizable project.
+        # projectAgentsFallback: cwd
+        # The model-facing line that opens the block, used verbatim. Empty leaves a
+        # bare block with no instruction wrapped around the text.
+        # projectAgentsPreamble: 'Global rules — follow these in every task in this project:'
