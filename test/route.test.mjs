@@ -94,12 +94,12 @@ describe('editor route', () => {
     assert.equal(prompt.effectiveText().includes('{{'), false)
   })
 
-  it('refuses a cross-site or origin-less write', async () => {
+  it('refuses a cross-site write', async () => {
     for (const headers of [
       { origin: 'http://evil.example', host: '127.0.0.1:3000' },
+      { origin: 'http://127.0.0.1:4000', host: '127.0.0.1:3000' },
       { origin: '::not a url::', host: '127.0.0.1:3000' },
-      { host: '127.0.0.1:3000' },
-      {},
+      { origin: 'http://127.0.0.1:3000' },
     ]) {
       const response = fakeResponse()
       await createEditorHandler(prompt, options)(
@@ -109,6 +109,26 @@ describe('editor route', () => {
       assert.equal(response.status, 403)
     }
     assert.equal(prompt.read().content, '{"a": "{{x}}"}')
+  })
+
+  it('accepts the two Origin-less callers the desktop app produces', async () => {
+    // The Desktop shell relays the dsh-app:// page's POST to this server and
+    // strips Origin on the way, so a save there arrives with no Origin at all.
+    for (const headers of [
+      { host: '127.0.0.1:3000' },
+      { origin: 'dsh-app://app', host: '127.0.0.1:3000' },
+      { origin: '', host: '127.0.0.1:3000' },
+      {},
+    ]) {
+      const response = fakeResponse()
+      await createEditorHandler(prompt, options)(
+        fakeRequest('POST', { headers, body: JSON.stringify({ content: 'from desktop' }) }),
+        response,
+      )
+      assert.equal(response.status, 200, JSON.stringify(headers))
+      assert.equal(JSON.parse(response.body).ok, true)
+      assert.equal(prompt.read().content, 'from desktop')
+    }
   })
 
   it('rejects a body without string content', async () => {

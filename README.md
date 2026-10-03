@@ -105,6 +105,7 @@ dsh --profile web --dump-config | Select-String -Context 0,8 'global-system-prom
 - **文件存在但内容为空 = 不注入提示词正文**（文件位置说明仍会附加，见 `announcePaths`），这也是临时静音的办法；删掉文件则回到配置里的 `text` 兜底（默认为空）。
 - 面板会显示提示词文件路径、**用户全局指令文件**路径与状态、段落位置 order、实际注入字节数，还有一个「实际注入预览」可以展开看模型读到的原文；文件超过 `maxBytes`（默认 64 KiB）时超出部分不会注入。
 - 面板底部还有两行关于项目 `AGENTS.md` 的状态：本进程同步过哪些项目、最近一次动作（已创建 / 已更新 / 已是最新 / 已移除 / 已跳过 / 失败），以及「写入项目的区块」预览。
+- **dsh Desktop 同样可用**：桌面宿主把 `dsh-app://` 页面发出的请求转发给本地服务时会**去掉 `Origin` 头**（改挂宿主自己的鉴权 Cookie），所以写入校验显式放行「没有 `Origin`」与 `dsh-app://` 两种来源——不放行的话，桌面端点「保存」只会拿到 403，文件改不动（浏览器页面永远带 `Origin`，跨站写入照样被拒）。
 
 <a id="同步到项目-agentsmd"></a>
 ## 同步到项目 AGENTS.md
@@ -258,7 +259,7 @@ dsh-global-system-prompt/
 - **文件位置说明**：`prompt.js` 的 `pathsNote()` 生成那段 footer，两个文件各读一次 `stat`（同样带 mtime 缓存），所以「已存在 / 尚未创建」是实时状态。
 - **项目同步的时机**：`agent/session-start` 是 harness 保证在首次组装提示词之前发出的同步通知（`agent.session.header.cwd` 此时已就绪），所以第一个 step 就能读到写好的 `AGENTS.md`；`agent/pre-step` 是 waterfall，插件 `await next()` 之后才复查，绝不改动 `PreStepDecision`。稳态下每次复查只做一次 `statSync`（记住「我写的区块 + 文件当时的 mtime/size」），不匹配才读文件。
 - **只在标记之间动手**：`upsertManagedBlock` 认标记不认位置，能在文件任意位置替换、把重复区块收敛成一个、保留 CRLF 与 BOM；标记只剩一半（被手改坏）时**拒绝写入**并 warning，宁可不同步也不吃用户的内容。
-- **面板路由**：`GET /global-prompt` 返回文件内容、两个文件的路径与状态、**本回合实际注入的原文**、以及项目同步状态与要写入的区块原文（面板据此预览），`POST` 校验同源后原子写入（临时文件 + rename）。
+- **面板路由**：`GET /global-prompt` 返回文件内容、两个文件的路径与状态、**本回合实际注入的原文**、以及项目同步状态与要写入的区块原文（面板据此预览），`POST` 通过来源校验后原子写入（临时文件 + rename）；校验放行同源、无 `Origin`（桌面宿主转发）与 `dsh-app://`（桌面页面）三种来源，其余一律 403。
 
 <a id="开发"></a>
 ## 开发

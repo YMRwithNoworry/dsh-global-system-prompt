@@ -94,6 +94,7 @@ Open Settings → **全局提示词 (Global prompt)**, write the text, save.
 - An **existing but empty file injects nothing**, which is how you silence the prompt temporarily; delete the file and the row's `text` fallback takes over (empty by default).
 - The panel shows the path, the section order, and the bytes actually injected; content beyond `maxBytes` (64 KiB by default) is not injected and the panel says so.
 - The panel's bottom section has two status lines for the project `AGENTS.md`: which projects this process has synced, the latest action (created / updated / already current / removed / skipped / failed), and a preview of the block written into projects.
+- **dsh Desktop works too**: the Desktop shell relays the `dsh-app://` page's requests to this local server with the `Origin` header **stripped** (it attaches the Host's own authentication cookie instead), so the write check explicitly accepts both "no `Origin`" and the `dsh-app://` scheme — without that, every *save* in the desktop app answers 403 and the file never changes. A browser page always sends `Origin`, so cross-site writes are still refused.
 
 <a id="sync-into-the-projects-agentsmd"></a>
 ## Sync into the project's AGENTS.md
@@ -245,7 +246,7 @@ Notable decisions:
 - The file-location footer (`pathsNote()` in `prompt.js`) `stat`s both files through the same mtime cache, so "exists / not created yet" is live state.
 - Project sync timing: `agent/session-start` is the synchronous notification the harness guarantees before the first prompt assembly (`agent.session.header.cwd` is ready by then), so the very first step already sees the written `AGENTS.md`; `agent/pre-step` is a waterfall, and the plugin only re-checks after `await next()`, never altering the `PreStepDecision`. In steady state a re-check costs one `statSync` (it remembers the block it wrote plus the file's mtime/size) and only reads the file when that does not match.
 - It writes only between the markers: `upsertManagedBlock` matches markers rather than positions, so it can replace the block anywhere in the file, collapse duplicate blocks into one, and preserve CRLF and BOM; when only half a marker pair is left (a hand-broken file) it **refuses to write** and logs a warning — better out of sync than eating the user's content.
-- The panel route validates same-origin POSTs and writes atomically (staged file + rename); its `GET` payload also carries the exact injected text so the panel can preview what the model reads, plus the project sync status and the block text about to be written into a project file.
+- The panel route accepts a POST from the same origin, from a caller with no `Origin` at all (the Desktop shell relay), or from the `dsh-app://` desktop page, then writes atomically (staged file + rename); its `GET` payload also carries the exact injected text so the panel can preview what the model reads, plus the project sync status and the block text about to be written into a project file.
 
 <a id="development"></a>
 ## Development
